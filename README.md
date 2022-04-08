@@ -36,6 +36,7 @@ Style Transfer
 
 `src` - Project source code
 * `lib` - Library code, functions, classes, etc. (things that get imported)
+  * `bpe_parser.py` functions to parse BPE data to text
 * `nb` - Notebooks, training code, data collection, evaluation, etc. (things that get ran)
 
 `data` - Project data
@@ -44,3 +45,5 @@ Style Transfer
         * `tweets` - tweet data
             * `dev.input0.bpe` - byte-pair encoded text (development set)
             * `dev.label` - labels for development set (all english_tweet)
+* `vocabs`
+  * `tweets.json` - json mapping tokens to integers
