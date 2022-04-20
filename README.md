@@ -36,8 +36,10 @@ Style Transfer
 
 `src` - Project source code
 * `lib` - Library code, functions, classes, etc. (things that get imported)
-  * `bpe_parser.py` functions to parse BPE data to text
+  * `bpe_parser.py`- functions to parse BPE data to text
 * `nb` - Notebooks, training code, data collection, evaluation, etc. (things that get ran)
+  * `bpe_reader.ipynb` - proof of concept reading data into numpy arrays from the bpe files
+  * `vocab_decoder.ipynb` - Used to join decode and join the cds bpe data into a single natural language csv file
 
 `data` - Project data
 * `datasets` - datasets folder from the style_transfer_paraphrase google drive
