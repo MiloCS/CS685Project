@@ -1,9 +1,17 @@
 import numpy as np
 import os
 import json
+from multiprocessing import Pool
+from itertools import repeat
 
 
-def read_bpe_data(data_path):
+def helper_process_row(row):
+        # row string " 123 456 789\n" -> integer list [123, 456, 789]
+        row = row.strip().split()
+        row = list(map(int, row))
+        return row
+
+def read_bpe_data(data_path, n_pools=8):
     """
     Reads in the BPE data from the given path into an (N, M) integer numpy array.
     Samples are padded with -1
@@ -11,15 +19,11 @@ def read_bpe_data(data_path):
     M = Maximum number of tokens in an example
     """
     with open(data_path, "r") as f:
-        lines = f.readlines()
+        lines = f.readlines()    
 
-    def process_row(row):
-        # row string " 123 456 789\n" -> integer list [123, 456, 789]
-        row = row.strip().split()
-        row = list(map(int, row))
-        return row
-
-    list_data = list(map(process_row, lines))
+    with Pool(n_pools) as p:
+    # list_data = list(map(process_row, lines))
+        list_data = list(p.map(helper_process_row, lines))
 
     # Find the length of the longest samples in the data
     max_len = 0
@@ -55,7 +59,19 @@ def read_int_to_token(vocab_path):
     return vocab_dict
 
 
-def decode_bpe_to_text(bpe_data, vocab_dict):
+def helper_int_row_to_str(row, vocab_dict):
+    decoded_row = ""
+    # decoded_data.append([vocab_dict[i] for i in row if i != -1])
+    for i in row:
+        if i == -1:
+            break
+        decoded_row += vocab_dict[i]
+
+    # replace Ġ with a space
+    decoded_row = decoded_row.replace("Ġ", " ")
+    return decoded_row
+
+def decode_bpe_to_text(bpe_data, vocab_dict, n_pools=8):
     """
     Decodes the BPE data into a list of strings without the Ġ characters
 
@@ -66,11 +82,17 @@ def decode_bpe_to_text(bpe_data, vocab_dict):
     Returns:
         list: List of strings
     """
-    decoded_data = []
-    for row in bpe_data:
-        decoded_data.append([vocab_dict[i] for i in row if i != -1])
+    
+    # split the data into chunks of size len(bpe_data) // n_pools
+    # chunks = np.array_split(bpe_data, n_pools)
+    # zip every chunk with a copy of the vocab_dict
+    # inputs = list(zip(chunks, [vocab_dict] * len(chunks)))
+
+    with Pool(n_pools) as p:
+        decoded_data = list(p.starmap(helper_int_row_to_str, zip(bpe_data, repeat(vocab_dict))))
+        
     # join the list of lists into a list of strings
-    decoded_data = ["".join(row) for row in decoded_data]
-    # remove the Ġ prefixes
-    decoded_data = [row.replace("Ġ", " ") for row in decoded_data]
+    # print(type(decoded_data))
+    # decoded_data = ["".join(row) for row in decoded_data]
     return decoded_data
+
