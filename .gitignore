@@ -2,3 +2,5 @@ env/
 data/
 src/lib/__pycache__/
 src/nb/.ipynb_checkpoints/
+style-transfer-paraphrase/
+models/
