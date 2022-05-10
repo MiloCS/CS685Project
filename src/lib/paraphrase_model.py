@@ -14,17 +14,19 @@ class Paraphraser:
 
 
     def get_token_embeddings(self, input_ids):
-        """ Returns the embeddings of the tokens in the input_ids with positional embeddings."""
-        embeddings = self.model.transformer.wte.weight
-        position_embeddings = self.model.transformer.wpe.weight
-        seq_len = input_ids.shape[1]
-        return embeddings[input_ids] + position_embeddings[torch.arange(seq_len).repeat(input_ids.shape[0], 1).to(self.device)]
+        """ Returns the embeddings of the tokens in th input_ids with positional embeddings."""
+        self.model.eval()
+        with torch.no_grad():
+            embeddings = self.model.transformer.wte.weight
+            position_embeddings = self.model.transformer.wpe.weight
+            seq_len = input_ids.shape[1]
+            return embeddings[input_ids] + position_embeddings[torch.arange(seq_len).repeat(input_ids.shape[0], 1).to(self.device)]
         
 
 
-    def get_input_ids_and_attention_masks(self, texts):
+    def get_input_ids_and_attention_masks(self, texts, max_length=50):
         """See method name"""
-        tokenized = self.tokenizer(texts, return_tensors="pt", padding=True)
+        tokenized = self.tokenizer(texts, return_tensors="pt", padding=True, max_length=max_length)
         input_ids = tokenized["input_ids"].to(self.device)
         attention_mask = tokenized["attention_mask"].to(self.device)
 
@@ -60,14 +62,16 @@ class Paraphraser:
         attention_mask = torch.cat((attention_mask, att_tensor), dim=1)
 
         # generate until the model generates the EOS token or reaches max_generate
-        generated = self.model.generate(
-            input_ids,
-            attention_mask=attention_mask,
-            eos_token_id=self.tokenizer.eos_token_id,
-            pad_token_id=self.tokenizer.pad_token_id,
-            bos_token_id=self.tokenizer.bos_token_id,
-            max_length=max_generate,
-        )
+        self.model.eval()
+        with torch.no_grad(): # I don't know if this is neccessary but it can't hurt and I don't have time to figure it out
+            generated = self.model.generate(
+                input_ids,
+                attention_mask=attention_mask,
+                eos_token_id=self.tokenizer.eos_token_id,
+                pad_token_id=self.tokenizer.pad_token_id,
+                bos_token_id=self.tokenizer.bos_token_id,
+                max_length=max_generate,
+            )
 
         # select the tokens generated after the BOS token and before the EOS token
         generated = generated[:, input_ids.shape[1]:-1]
