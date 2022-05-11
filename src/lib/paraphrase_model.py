@@ -26,7 +26,7 @@ class Paraphraser:
 
     def get_input_ids_and_attention_masks(self, texts, max_length=50):
         """See method name"""
-        tokenized = self.tokenizer(texts, return_tensors="pt", padding=True, max_length=max_length)
+        tokenized = self.tokenizer(texts, return_tensors="pt", padding=True, max_length=max_length, truncation=True)
         input_ids = tokenized["input_ids"].to(self.device)
         attention_mask = tokenized["attention_mask"].to(self.device)
 
