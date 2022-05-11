@@ -11,6 +11,19 @@ import numpy as np
 from src.lib.paraphrase_model import Paraphraser
 from src.lib.style_classifier import StyleEncoder
 
+import torch
+# get Dataset class
+from torch.utils.data import Dataset, DataLoader
+from torch import nn
+
+from tqdm.notebook import tqdm
+
+import pandas as pd
+import numpy as np
+
+from src.lib.paraphrase_model import Paraphraser
+from src.lib.style_classifier import StyleEncoder
+
 class DecoderDataset(Dataset):
 
     def __init__(self, df=None, batch_size=64, state_dict=None):
@@ -58,13 +71,14 @@ class DecoderDataset(Dataset):
         torch.cuda.empty_cache()
 
         # put everything on the cpu
-        self.style_encodings = self.style_encodings.to("cpu")
-        self.positional_embeds = self.positional_embeds.to("cpu")
-        self.token_embeds = self.token_embeds.to("cpu")
-        self.para_ids = self.para_ids.to("cpu")
-        self.para_attn = self.para_attn.to("cpu")
-        self.target_ids = self.target_ids.to("cpu")
-        self.target_attn = self.target_attn.to("cpu")
+        self.style_encodings = self.style_encodings.to("cpu").detach()
+        self.positional_embeds = self.positional_embeds.to("cpu").detach()
+        self.token_embeds = self.token_embeds.to("cpu").detach()
+        self.para_ids = self.para_ids.to("cpu").detach()
+        self.para_attn = self.para_attn.to("cpu").detach()
+        self.target_ids = self.target_ids.to("cpu").detach()
+        self.target_attn = self.target_attn.to("cpu").detach()
+
         torch.cuda.empty_cache()
     
 
@@ -108,6 +122,15 @@ class DecoderDataset(Dataset):
 
         label = target_ids[selected_idx]
         label_idx = len(para_ids) + 2 + selected_idx
+
+        style_encoding = style_encoding.detach()
+        para_embed = para_embed.detach()
+        para_pos = para_pos.detach()
+        target_embeds = target_embeds.detach()
+        target_pos = target_pos.detach()
+        attn_mask = attn_mask.detach()
+        label = label.detach()
+        bos_pos = bos_pos.detach()
 
         return (
             style_encoding, # Style encoding form BERT style classification of the target sentence

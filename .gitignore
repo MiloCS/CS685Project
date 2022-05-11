@@ -4,3 +4,5 @@ src/lib/__pycache__/
 src/nb/.ipynb_checkpoints/
 style-transfer-paraphrase/
 models/
+decoder_checkpoints/
+decoder_checkpoints.zip
