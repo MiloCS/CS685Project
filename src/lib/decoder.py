@@ -50,8 +50,6 @@ class Decoder(nn.Module):
 
         # project the style encoding
         style_encoding = self.style_projection(style_encoding).unsqueeze(1)
-        
-
 
         # concatenate style_encoding, para_embeds, bos_embed, and target_embeds
         inputs_embeds = torch.cat([style_encoding, para_embeds, bos_embed, target_embeds], dim=1)
