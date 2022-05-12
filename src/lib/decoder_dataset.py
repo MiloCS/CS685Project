@@ -93,11 +93,11 @@ class DecoderDataset(Dataset):
         style_encoding = self.style_encodings[random_style_encoding_idx]
 
         para_ids = self.para_ids[idx]
-        para_embed = self.token_embeds[para_ids]
+        # para_embed = self.token_embeds[para_ids]
         para_attn_mask = self.para_attn[idx]
 
         target_ids = self.target_ids[idx]
-        target_embeds = self.token_embeds[target_ids]
+        # target_embeds = self.token_embeds[target_ids]
         target_attn_mask = self.target_attn[idx].detach().clone()
 
         # select a random non-padding text index
@@ -121,12 +121,14 @@ class DecoderDataset(Dataset):
         attn_mask[len(para_attn_mask)+2:] = target_attn_mask
 
         label = target_ids[selected_idx]
-        label_idx = len(para_ids) + 2 + selected_idx
+        label_idx = len(para_ids) + 1 + selected_idx # label_idx is the last token of the target text 
 
         style_encoding = style_encoding.detach()
-        para_embed = para_embed.detach()
+        # para_embed = para_embed.detach()
+        para_ids = para_ids.detach()
         para_pos = para_pos.detach()
-        target_embeds = target_embeds.detach()
+        # target_embeds = target_embeds.detach()
+        target_ids = target_ids.detach()
         target_pos = target_pos.detach()
         attn_mask = attn_mask.detach()
         label = label.detach()
@@ -134,9 +136,9 @@ class DecoderDataset(Dataset):
 
         return (
             style_encoding, # Style encoding form BERT style classification of the target sentence
-            (para_embed, para_pos), # Token embeddings from the paraphrased sentence with positional embeddings
+            (para_ids, para_pos), # Token embeddings from the paraphrased sentence with positional embeddings
             bos_pos, # Positional embedding of the BOS token
-            (target_embeds, target_pos), # Token embeddings from the target sentence with positional embeddings
+            (target_ids, target_pos), # Token embeddings from the target sentence with positional embeddings
             attn_mask # Attention mask for the entire sequence
         ), (
             label, # Token id of the token to be predicted - index in vocab
