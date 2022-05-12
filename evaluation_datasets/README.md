@@ -7,7 +7,7 @@ There are several datasets in this directory, along with code which formats them
   * Bible Dataset (bible)
     * Obtained from https://github.com/keithecarlson/StyleTransferBibleData
   * Knight's Tale from the Canterbury Tales (knightstale)
-    *Obtained from https://chaucer.fas.harvard.edu/pages/knights-tale-0
+    * Obtained from https://chaucer.fas.harvard.edu/pages/knights-tale-0
 
 * Not Parallel Datasets, containing only one version of each line:
   * Alice in Wonderland (alice)
