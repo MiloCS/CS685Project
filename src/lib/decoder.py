@@ -30,6 +30,7 @@ class Decoder(nn.Module):
         self.gpt2 = GPT2LMHeadModel.from_pretrained(model_path)
         self.style_projection = nn.Linear(768, 1280)
     
+    
     def forward(self, x):
         style_encoding, para, bos_pos, target, attn_mask = x
 
